@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import Combine
+import CoreLocation
 #if canImport(UIKit)
 import UIKit
 #endif
