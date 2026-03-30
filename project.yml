@@ -11,7 +11,7 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    DEVELOPMENT_TEAM: ""          # ← Fill in your Apple Developer Team ID
+    DEVELOPMENT_TEAM: "AST4JRT9JU"
     DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
     ENABLE_BITCODE: NO
 
