@@ -1,0 +1,87 @@
+name: WorkoutTracker
+
+options:
+  bundleIdPrefix: com.victorkzam
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  xcodeVersion: "15.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""          # ← Fill in your Apple Developer Team ID
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+    ENABLE_BITCODE: NO
+
+packages: {}
+
+targets:
+
+  # ─── iOS App ───────────────────────────────────────────────────────────────
+  WorkoutTracker:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Shared
+        excludes: []
+      - path: iOS
+        excludes: []
+    resources:
+      - iOS/App/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.victorkzam.WorkoutTracker
+        INFOPLIST_FILE: iOS/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: iOS/App/WorkoutTracker.entitlements
+        TARGETED_DEVICE_FAMILY: "1"       # iPhone only
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: iOS
+    xcconfig: Secrets.xcconfig
+    capabilities:
+      healthKit:
+        enabled: YES
+      iCloud:
+        cloudKit: YES
+        containers:
+          - iCloud.com.victorkzam.WorkoutTracker
+      backgroundModes:
+        modes:
+          - location
+          - workout-processing
+      pushNotifications: {}
+    dependencies:
+      - target: WorkoutTrackerWatch
+        embed: true
+
+  # ─── Watch App ─────────────────────────────────────────────────────────────
+  WorkoutTrackerWatch:
+    type: application
+    platform: watchOS
+    deploymentTarget: "10.0"
+    sources:
+      - path: Shared
+        excludes: []
+      - path: Watch
+        excludes: []
+    resources:
+      - Watch/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.victorkzam.WorkoutTracker.watchkitapp
+        INFOPLIST_FILE: Watch/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Watch/WorkoutTrackerWatch.entitlements
+        TARGETED_DEVICE_FAMILY: "4"       # Apple Watch
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: watchOS
+    xcconfig: Secrets.xcconfig
+    capabilities:
+      healthKit:
+        enabled: YES
+      iCloud:
+        cloudKit: YES
+        containers:
+          - iCloud.com.victorkzam.WorkoutTracker
+      backgroundModes:
+        modes:
+          - workout-processing

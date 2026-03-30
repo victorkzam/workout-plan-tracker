@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>WorkoutTracker</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+
+    <!-- Location permissions -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>WorkoutTracker uses your location to track runs and cycling routes, calculate pace and distance.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>WorkoutTracker uses your location to track runs and cycling routes.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>WorkoutTracker uses your location in the background to continue tracking your workout if you lock your phone.</string>
+
+    <!-- HealthKit -->
+    <key>NSHealthShareUsageDescription</key>
+    <string>WorkoutTracker reads heart rate data to show your HR zone during workouts.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>WorkoutTracker saves your workout sessions, distance, and calories to Apple Health.</string>
+
+    <!-- Background modes -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>workout-processing</string>
+    </array>
+
+    <!-- OpenRouter API key — set via Secrets.xcconfig -->
+    <key>OPENROUTER_API_KEY</key>
+    <string>$(OPENROUTER_API_KEY)</string>
+</dict>
+</plist>
