@@ -3,7 +3,7 @@ import WatchKit
 
 struct GPSWatchView: View {
 
-    @ObservedObject var manager: WorkoutSessionManager
+    @Bindable var manager: WorkoutSessionManager
     var onEnd: () -> Void
 
     @State private var isPaused = false

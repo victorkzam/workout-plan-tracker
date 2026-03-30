@@ -43,7 +43,7 @@ final class WorkoutParserService {
         let estimatedTokens = Int(Double(rawText.count) / charsPerToken)
 
         #if canImport(FoundationModels)
-        if #available(iOS 18.0, *), estimatedTokens <= onDeviceTokenLimit {
+        if #available(iOS 26.0, *), estimatedTokens <= onDeviceTokenLimit {
             return try await parseOnDevice(rawText: rawText)
         }
         #endif
@@ -52,7 +52,7 @@ final class WorkoutParserService {
     }
 
     #if canImport(FoundationModels)
-    @available(iOS 18.0, *)
+    @available(iOS 26.0, *)
     private func parseOnDevice(rawText: String) async throws -> WorkoutPlan {
         let parser = AppleFoundationParser()
         let parsed = try await parser.parse(rawText: rawText)

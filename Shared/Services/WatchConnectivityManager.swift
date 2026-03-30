@@ -70,8 +70,7 @@ final class WatchConnectivityManager: NSObject {
 
     private func updateContext(_ payload: [String: Any]) {
         // application context only supports Plist-compatible types
-        let context = payload.compactMapValues { $0 as? any Sendable }
-        let plistContext = context.filter { isPlistCompatible($0.value) }
+        let plistContext = payload.filter { isPlistCompatible($0.value) }
         try? WCSession.default.updateApplicationContext(plistContext)
     }
 

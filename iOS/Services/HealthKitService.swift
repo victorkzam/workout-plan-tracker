@@ -10,7 +10,7 @@ final class HealthKitService {
     private(set) var activeWorkoutSession: HKWorkoutSession?
 
     private var heartRateQuery: HKAnchoredObjectQuery?
-    private var liveBuilder: HKLiveWorkoutBuilder?
+    private var liveBuilder: AnyObject?  // HKLiveWorkoutBuilder, requires iOS 26+
 
     static var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
 
@@ -39,36 +39,43 @@ final class HealthKitService {
         }
     }
 
-    // MARK: - Workout session (iOS 17+)
+    // MARK: - Workout session (iOS 26+)
 
     func startWorkoutSession(activityType: HKWorkoutActivityType) async {
         guard Self.isAvailable else { return }
+        guard #available(iOS 26.0, *) else {
+            startHeartRateUpdates()
+            return
+        }
+
         let config = HKWorkoutConfiguration()
         config.activityType = activityType
         config.locationType  = .outdoor
 
         do {
             let session = try HKWorkoutSession(healthStore: store, configuration: config)
+            activeWorkoutSession = session
             let builder = session.associatedWorkoutBuilder()
             builder.dataSource = HKLiveWorkoutDataSource(healthStore: store, workoutConfiguration: config)
-            activeWorkoutSession = session
             liveBuilder = builder
             session.startActivity(with: Date())
             try await builder.beginCollection(at: Date())
             startHeartRateUpdates()
         } catch {
-            // Silently fail — HR will show "--"
+            startHeartRateUpdates()
         }
     }
 
     func stopWorkoutSession() async {
-        guard let session = activeWorkoutSession,
-              let builder = liveBuilder else { return }
-        session.end()
-        do {
-            try await builder.endCollection(at: Date())
-            _ = try await builder.finishWorkout()
-        } catch {}
+        if #available(iOS 26.0, *), let session = activeWorkoutSession {
+            session.end()
+            if let builder = liveBuilder as? HKLiveWorkoutBuilder {
+                do {
+                    try await builder.endCollection(at: Date())
+                    _ = try await builder.finishWorkout()
+                } catch {}
+            }
+        }
         stopHeartRateUpdates()
         activeWorkoutSession = nil
         liveBuilder = nil

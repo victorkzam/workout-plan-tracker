@@ -185,7 +185,7 @@ struct SessionWatchView: View {
         if let session = session {
             // Standalone mode — launched from Watch independently
             isStandaloneMode = true
-            localSteps = SessionExecutionViewModel.flattenSteps(session: session)
+            localSteps = ExecutionStep.flattenSteps(session: session)
             localIndex = 0
             localIsRunning = true
             prepareLocalStep()

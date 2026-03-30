@@ -6,7 +6,7 @@ import Foundation
 #if canImport(FoundationModels)
 import FoundationModels
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 @Generable
 struct GenParsedWorkoutPlan {
     @Guide(description: "A short descriptive title for the overall plan")
@@ -15,7 +15,7 @@ struct GenParsedWorkoutPlan {
     var sessions: [GenParsedSession]
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 @Generable
 struct GenParsedSession {
     @Guide(description: "Full session name e.g. 'Session 1 — Monday: Easy Run + Core'")
@@ -33,7 +33,7 @@ struct GenParsedSession {
     var blocks: [GenParsedBlock]
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 @Generable
 struct GenParsedBlock {
     @Guide(description: "Block name e.g. 'Dynamic Warm-Up', 'Core Circuit'")
@@ -54,7 +54,7 @@ struct GenParsedBlock {
     var exercises: [GenParsedExercise]
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 @Generable
 struct GenParsedExercise {
     var name: String
@@ -99,17 +99,13 @@ struct GenParsedExercise {
     var sortOrder: Int
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 final class AppleFoundationParser {
 
     private let session: LanguageModelSession
 
     init() {
-        self.session = LanguageModelSession()
-    }
-
-    func parse(rawText: String) async throws -> ParsedWorkoutPlan {
-        let prompt = Instructions {
+        self.session = LanguageModelSession {
             "You are a workout plan parser."
             "Parse the following workout plan text into the requested structure."
             "Identify each session, its blocks (warmup, run, cycle, circuit, posture, core, stretch, cooldown), and all exercises."
@@ -117,10 +113,11 @@ final class AppleFoundationParser {
             "Convert pace strings like '5:50-6:10/km' to decimal min/km values (5.833 and 6.167)."
             "Include all instructional text, cues, and form notes in the instructions field."
         }
+    }
 
+    func parse(rawText: String) async throws -> ParsedWorkoutPlan {
         let result = try await session.respond(
             to: rawText,
-            instructions: prompt,
             generating: GenParsedWorkoutPlan.self
         )
 
@@ -130,7 +127,7 @@ final class AppleFoundationParser {
 
 // MARK: - Conversion from @Generable types to shared ParsedWorkoutPlan
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 extension GenParsedWorkoutPlan {
     func toParsedWorkoutPlan() -> ParsedWorkoutPlan {
         ParsedWorkoutPlan(
@@ -140,7 +137,7 @@ extension GenParsedWorkoutPlan {
     }
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 extension GenParsedSession {
     func toParsedSession() -> ParsedSession {
         ParsedSession(
@@ -153,7 +150,7 @@ extension GenParsedSession {
     }
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 extension GenParsedBlock {
     func toParsedBlock() -> ParsedBlock {
         ParsedBlock(
@@ -167,7 +164,7 @@ extension GenParsedBlock {
     }
 }
 
-@available(iOS 18.0, *)
+@available(iOS 26.0, *)
 extension GenParsedExercise {
     func toParsedExercise() -> ParsedExercise {
         ParsedExercise(
