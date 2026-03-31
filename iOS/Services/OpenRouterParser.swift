@@ -23,6 +23,7 @@ final class OpenRouterParser {
     private func buildRequestBody(rawText: String) -> [String: Any] {
         [
             "model": model,
+            "max_tokens": 8192,
             "response_format": ["type": "json_object"],
             "messages": [
                 ["role": "system", "content": systemPrompt],
@@ -37,6 +38,7 @@ final class OpenRouterParser {
         }
         var request = URLRequest(url: url)
         request.httpMethod  = "POST"
+        request.timeoutInterval = 30
         request.setValue("application/json",  forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)",  forHTTPHeaderField: "Authorization")
         request.setValue("WorkoutTracker/1.0", forHTTPHeaderField: "X-Title")
@@ -55,8 +57,20 @@ final class OpenRouterParser {
               let choices = json["choices"] as? [[String: Any]],
               let first = choices.first,
               let message = first["message"] as? [String: Any],
-              let content = message["content"] as? String,
-              let contentData = content.data(using: .utf8) else {
+              let content = message["content"] as? String else {
+            throw ParserError.malformedResponse
+        }
+
+        // Strip markdown fences that some models add despite response_format: json_object
+        var cleaned = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.hasPrefix("```") {
+            cleaned = cleaned
+                .replacingOccurrences(of: "```json", with: "")
+                .replacingOccurrences(of: "```", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        guard let contentData = cleaned.data(using: .utf8) else {
             throw ParserError.malformedResponse
         }
         return try JSONDecoder().decode(ParsedWorkoutPlan.self, from: contentData)
@@ -133,9 +147,9 @@ enum ParserError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:            return "Invalid API URL."
-        case .httpError(let code):   return "API error (HTTP \(code))."
-        case .malformedResponse:     return "Could not parse the API response."
-        case .onDeviceUnavailable:   return "On-device model is not available."
+        case .httpError(let code):   return "API error (HTTP \(code)). Please try again."
+        case .malformedResponse:     return "Could not understand the workout plan. Please check the format and try again."
+        case .onDeviceUnavailable:   return "On-device model is not available and no API key is configured."
         }
     }
 }

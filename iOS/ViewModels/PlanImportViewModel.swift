@@ -32,7 +32,7 @@ final class PlanImportViewModel {
             parsedPlan = plan
 
         case .failure(let error):
-            errorMessage = error.localizedDescription
+            errorMessage = Self.userFriendlyMessage(for: error)
 
         default:
             break
@@ -43,5 +43,12 @@ final class PlanImportViewModel {
         rawText = ""
         errorMessage = nil
         parsedPlan = nil
+    }
+
+    private static func userFriendlyMessage(for error: Error) -> String {
+        if let parserError = error as? ParserError {
+            return parserError.localizedDescription
+        }
+        return "Unable to parse the workout plan. Please check the format or try again."
     }
 }
