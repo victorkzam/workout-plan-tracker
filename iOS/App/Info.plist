@@ -46,6 +46,7 @@
     <array>
         <string>location</string>
         <string>workout-processing</string>
+        <string>remote-notification</string>
     </array>
 
     <!-- OpenRouter API key — set via Secrets.xcconfig -->

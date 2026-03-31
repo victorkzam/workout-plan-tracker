@@ -6,7 +6,7 @@ struct PlanDetailView: View {
 
     var body: some View {
         List {
-            ForEach(plan.sessions.sorted { $0.sortOrder < $1.sortOrder }) { session in
+            ForEach((plan.sessions ?? []).sorted { $0.sortOrder < $1.sortOrder }) { session in
                 NavigationLink(destination: SessionDetailView(session: session)) {
                     SessionRowView(session: session)
                 }

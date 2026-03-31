@@ -13,7 +13,7 @@ struct SessionDetailWatchView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
 
-                ForEach(session.blocks.sorted { $0.sortOrder < $1.sortOrder }) { block in
+                ForEach((session.blocks ?? []).sorted { $0.sortOrder < $1.sortOrder }) { block in
                     HStack(spacing: 6) {
                         Circle()
                             .fill(blockColor(block.blockType))

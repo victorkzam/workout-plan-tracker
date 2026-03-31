@@ -53,7 +53,7 @@ final class WorkoutBlock {
     var session: WorkoutSession?
 
     @Relationship(deleteRule: .cascade)
-    var exercises: [Exercise] = []
+    var exercises: [Exercise]?
 
     var blockType: BlockType {
         get { BlockType(rawValue: blockTypeRaw) ?? .circuit }

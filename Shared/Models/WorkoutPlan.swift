@@ -9,7 +9,7 @@ final class WorkoutPlan {
     var createdAt: Date = Date()
 
     @Relationship(deleteRule: .cascade)
-    var sessions: [WorkoutSession] = []
+    var sessions: [WorkoutSession]?
 
     init(name: String, rawText: String) {
         self.id = UUID()

@@ -25,9 +25,9 @@ struct ExecutionStep: Identifiable {
         var steps: [ExecutionStep] = []
         var globalIndex = 0
 
-        let sortedBlocks = session.blocks.sorted { $0.sortOrder < $1.sortOrder }
+        let sortedBlocks = (session.blocks ?? []).sorted { $0.sortOrder < $1.sortOrder }
         for block in sortedBlocks {
-            let sortedExercises = block.exercises.sorted { $0.sortOrder < $1.sortOrder }
+            let sortedExercises = (block.exercises ?? []).sorted { $0.sortOrder < $1.sortOrder }
             for round in 1...max(1, block.rounds) {
                 for (exerciseIdx, exercise) in sortedExercises.enumerated() {
                     steps.append(ExecutionStep(

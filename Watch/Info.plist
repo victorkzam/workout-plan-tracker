@@ -20,6 +20,8 @@
     <string>1</string>
     <key>WKApplication</key>
     <true/>
+    <key>WKCompanionAppBundleIdentifier</key>
+    <string>com.victorkzam.WorkoutTracker</string>
     <key>NSHealthShareUsageDescription</key>
     <string>WorkoutTracker reads heart rate and GPS data during your workout sessions.</string>
     <key>NSHealthUpdateUsageDescription</key>

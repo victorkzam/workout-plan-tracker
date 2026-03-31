@@ -32,7 +32,7 @@ struct SessionListWatchView: View {
                 List {
                     ForEach(plans) { plan in
                         Section(plan.name) {
-                            ForEach(plan.sessions.sorted { $0.sortOrder < $1.sortOrder }) { session in
+                            ForEach((plan.sessions ?? []).sorted { $0.sortOrder < $1.sortOrder }) { session in
                                 NavigationLink(destination: SessionDetailWatchView(session: session)) {
                                     WatchSessionRow(session: session)
                                 }

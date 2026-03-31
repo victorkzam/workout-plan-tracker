@@ -75,7 +75,7 @@ private struct PlanRowView: View {
             Text(plan.name)
                 .font(.headline)
             HStack {
-                Text("\(plan.sessions.count) sessions")
+                Text("\((plan.sessions ?? []).count) sessions")
                 Text("·")
                 Text(plan.createdAt.formatted(date: .abbreviated, time: .omitted))
             }

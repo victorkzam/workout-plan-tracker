@@ -10,7 +10,7 @@ struct SessionDetailView: View {
             VStack(alignment: .leading, spacing: 20) {
                 sessionHeader
 
-                ForEach(session.blocks.sorted { $0.sortOrder < $1.sortOrder }) { block in
+                ForEach((session.blocks ?? []).sorted { $0.sortOrder < $1.sortOrder }) { block in
                     BlockPreviewView(block: block)
                 }
 
@@ -30,7 +30,7 @@ struct SessionDetailView: View {
         HStack(spacing: 16) {
             StatChip(icon: "clock", value: "\(session.totalMinutes) min")
             StatChip(icon: session.sessionType.systemImage, value: session.sessionType.displayName)
-            StatChip(icon: "repeat", value: "\(session.blocks.count) blocks")
+            StatChip(icon: "repeat", value: "\((session.blocks ?? []).count) blocks")
         }
     }
 
@@ -72,7 +72,7 @@ private struct BlockPreviewView: View {
                     .foregroundStyle(.secondary)
             }
 
-            ForEach(block.exercises.sorted { $0.sortOrder < $1.sortOrder }) { exercise in
+            ForEach((block.exercises ?? []).sorted { $0.sortOrder < $1.sortOrder }) { exercise in
                 ExercisePreviewRow(exercise: exercise)
             }
         }

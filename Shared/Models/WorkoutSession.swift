@@ -38,10 +38,10 @@ final class WorkoutSession {
     var plan: WorkoutPlan?
 
     @Relationship(deleteRule: .cascade)
-    var blocks: [WorkoutBlock] = []
+    var blocks: [WorkoutBlock]?
 
     @Relationship(deleteRule: .cascade)
-    var executions: [SessionExecution] = []
+    var executions: [SessionExecution]?
 
     var sessionType: SessionType {
         get { SessionType(rawValue: sessionTypeRaw) ?? .mixed }
