@@ -29,8 +29,17 @@ WorkoutTracker/
 │   │   ├── Exercise.swift          # @Model -- individual exercise, has ExerciseType enum
 │   │   ├── SessionExecution.swift  # @Model -- recorded execution (distance, pace, HR, route)
 │   │   └── ExecutionStep.swift     # Value type -- flattened step for execution engine
-│   └── Services/
-│       └── WatchConnectivityManager.swift  # Singleton, WCSession delegate
+│   ├── Protocols/
+│   │   ├── WorkoutParserProtocol.swift      # Abstraction for parser testability
+│   │   ├── HealthKitServiceProtocol.swift   # Abstraction for HealthKit testability
+│   │   ├── LocationServiceProtocol.swift    # Abstraction for location testability
+│   │   └── WatchConnectivityProtocol.swift  # Abstraction for WC testability
+│   ├── Services/
+│   │   └── WatchConnectivityManager.swift   # Singleton, WCSession delegate
+│   └── Utilities/
+│       ├── Logging.swift           # os.Logger extensions (per-module categories)
+│       ├── GPSMath.swift           # Pace formatting, speed smoothing helpers
+│       └── ModelContainerFactory.swift  # SwiftData container with CloudKit config
 │
 ├── iOS/
 │   ├── App/
@@ -154,3 +163,4 @@ Both the iOS and watchOS targets configure `ModelContainer` with a private Cloud
 - **@Model for persistence** -- five SwiftData model classes with `@Relationship(deleteRule: .cascade)` forming the hierarchy: `WorkoutPlan` -> `WorkoutSession` -> `WorkoutBlock` -> `Exercise`, plus `SessionExecution`.
 - **ExecutionStep flattening** -- `ExecutionStep.flattenSteps(session:)` expands blocks x rounds x exercises into a linear array, inserting rest steps for interval blocks.
 - **Pace smoothing** -- both `LocationService` (iOS) and `WorkoutSessionManager` (Watch) use a 3-point rolling average of raw GPS speed, filtering readings below 0.5 m/s.
+- **Protocol-driven testability** -- key services are abstracted behind protocols (`WorkoutParserProtocol`, `HealthKitServiceProtocol`, `LocationServiceProtocol`, `WatchConnectivityProtocol`) defined in `Shared/Protocols/`. View models accept these protocols via initializer injection.

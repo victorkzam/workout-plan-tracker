@@ -22,13 +22,14 @@
 ## Error Handling
 
 - **No empty `catch` blocks.** Always handle or log the error. If recovery is not possible, surface the error to the user (e.g. `PlanImportViewModel.errorMessage`).
-- Use `os.Logger` for diagnostic logging:
+- Use `os.Logger` for diagnostic logging. The project defines static `Logger` instances via an extension in `Shared/Utilities/Logging.swift`:
   ```swift
   import os
-  private let logger = Logger(subsystem: "com.victorkzam.WorkoutTracker", category: "Parsing")
-  logger.error("Failed to decode plan: \(error.localizedDescription)")
+  // Use the pre-defined loggers:
+  Logger.parser.error("Failed to decode plan: \(error.localizedDescription)")
+  Logger.location.info("GPS session started")
   ```
-- Use per-module categories: `"Parsing"`, `"Location"`, `"HealthKit"`, `"Sync"`, etc.
+- Available categories (defined in `Logging.swift`): `"Parser"`, `"Location"`, `"HealthKit"`, `"Connectivity"`, `"Workout"`. Add new categories to the `Logger` extension as needed.
 - Define domain-specific error enums with `LocalizedError` conformance (see `ParserError`).
 
 ## Performance
