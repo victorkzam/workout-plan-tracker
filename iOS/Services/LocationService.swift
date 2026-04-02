@@ -2,7 +2,7 @@ import Foundation
 import CoreLocation
 
 @Observable
-final class LocationService: NSObject {
+final class LocationService: NSObject, LocationServiceProtocol {
 
     private(set) var currentPaceSecPerKm: Double = 0    // smoothed
     private(set) var totalDistanceMeters: Double = 0
@@ -69,16 +69,11 @@ final class LocationService: NSObject {
     // MARK: - Pace formatting
 
     var paceDisplayString: String {
-        guard currentPaceSecPerKm > 0 else { return "--:--" }
-        let m = Int(currentPaceSecPerKm) / 60
-        let s = Int(currentPaceSecPerKm) % 60
-        return String(format: "%d:%02d /km", m, s)
+        GPSMath.formatPace(secondsPerKm: currentPaceSecPerKm)
     }
 
     var distanceDisplayString: String {
-        totalDistanceMeters >= 1000
-            ? String(format: "%.2f km", totalDistanceMeters / 1000)
-            : String(format: "%.0f m", totalDistanceMeters)
+        GPSMath.formatDistance(meters: totalDistanceMeters)
     }
 
     var avgPaceSecPerKm: Double {
@@ -115,8 +110,8 @@ extension LocationService: CLLocationManagerDelegate {
             if rawSpeedMps > 0.5 {                     // ignore near-stationary
                 recentSpeeds.append(rawSpeedMps)
                 if recentSpeeds.count > 3 { recentSpeeds.removeFirst() }
-                let avgSpeed = recentSpeeds.reduce(0, +) / Double(recentSpeeds.count)
-                currentPaceSecPerKm = 1000 / avgSpeed  // sec/km
+                let avgSpeed = GPSMath.smoothSpeed(recentSpeeds: recentSpeeds)
+                currentPaceSecPerKm = GPSMath.paceFromSpeed(avgSpeed)
             }
         }
     }

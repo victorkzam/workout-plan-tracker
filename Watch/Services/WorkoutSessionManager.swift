@@ -134,16 +134,11 @@ final class WorkoutSessionManager: NSObject {
     // MARK: - Formatting
 
     var paceDisplayString: String {
-        guard currentPaceSecPerKm > 0 else { return "--:--" }
-        let m = Int(currentPaceSecPerKm) / 60
-        let s = Int(currentPaceSecPerKm) % 60
-        return String(format: "%d:%02d /km", m, s)
+        GPSMath.formatPace(secondsPerKm: currentPaceSecPerKm)
     }
 
     var distanceDisplayString: String {
-        distance >= 1000
-            ? String(format: "%.2f km", distance / 1000)
-            : String(format: "%.0f m", distance)
+        GPSMath.formatDistance(meters: distance)
     }
 
     var elapsedString: String {
@@ -199,8 +194,8 @@ extension WorkoutSessionManager: CLLocationManagerDelegate {
             if speed > 0.5 {
                 recentSpeeds.append(speed)
                 if recentSpeeds.count > 3 { recentSpeeds.removeFirst() }
-                let avg = recentSpeeds.reduce(0, +) / Double(recentSpeeds.count)
-                currentPaceSecPerKm = 1000 / avg
+                let avg = GPSMath.smoothSpeed(recentSpeeds: recentSpeeds)
+                currentPaceSecPerKm = GPSMath.paceFromSpeed(avg)
             }
         }
     }

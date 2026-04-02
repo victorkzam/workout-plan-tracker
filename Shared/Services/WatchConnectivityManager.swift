@@ -33,7 +33,7 @@ enum WCMessageType: String {
 // MARK: - WatchConnectivityManager
 
 @Observable
-final class WatchConnectivityManager: NSObject {
+final class WatchConnectivityManager: NSObject, WatchConnectivityProtocol {
 
     static let shared = WatchConnectivityManager()
 

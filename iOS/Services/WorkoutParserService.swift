@@ -5,7 +5,7 @@ import Foundation
 // OpenRouter Gemini 2.0 Flash Lite (cloud fallback).
 
 @Observable
-final class WorkoutParserService {
+final class WorkoutParserService: WorkoutParserProtocol {
 
     enum State {
         case idle

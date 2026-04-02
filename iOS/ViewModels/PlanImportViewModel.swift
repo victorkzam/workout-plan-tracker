@@ -9,10 +9,15 @@ final class PlanImportViewModel {
     var errorMessage: String? = nil
     var parsedPlan: WorkoutPlan? = nil
 
-    private let parserService: WorkoutParserService
+    private let parserService: any WorkoutParserProtocol
 
-    init(openRouterAPIKey: String) {
-        self.parserService = WorkoutParserService(openRouterAPIKey: openRouterAPIKey)
+    init(parserService: any WorkoutParserProtocol) {
+        self.parserService = parserService
+    }
+
+    /// Convenience initializer preserving backward compatibility.
+    convenience init(openRouterAPIKey: String) {
+        self.init(parserService: WorkoutParserService(openRouterAPIKey: openRouterAPIKey))
     }
 
     var canParse: Bool { !rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isParsing }

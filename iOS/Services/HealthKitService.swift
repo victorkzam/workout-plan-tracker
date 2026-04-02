@@ -2,7 +2,7 @@ import Foundation
 import HealthKit
 
 @Observable
-final class HealthKitService {
+final class HealthKitService: HealthKitServiceProtocol {
 
     private let store = HKHealthStore()
     private(set) var isAuthorized = false

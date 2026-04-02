@@ -23,16 +23,16 @@ final class SessionExecutionViewModel {
     private(set) var elapsedTotal: Double = 0
 
     // Dependencies
-    let locationService: LocationService
-    let healthKitService: HealthKitService
+    let locationService: any LocationServiceProtocol
+    let healthKitService: any HealthKitServiceProtocol
 
     private var timerCancellable: AnyCancellable?
     private var totalElapsedTimer: AnyCancellable?
     private var sessionStartDate: Date?
 
     init(session: WorkoutSession,
-         locationService: LocationService,
-         healthKitService: HealthKitService) {
+         locationService: any LocationServiceProtocol = LocationService(),
+         healthKitService: any HealthKitServiceProtocol = HealthKitService()) {
         self.session = session
         self.locationService = locationService
         self.healthKitService = healthKitService

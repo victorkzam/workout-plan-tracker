@@ -4,26 +4,7 @@ import SwiftData
 @main
 struct WorkoutTrackerWatchApp: App {
 
-    private let modelContainer: ModelContainer = {
-        let schema = Schema([
-            WorkoutPlan.self,
-            WorkoutSession.self,
-            WorkoutBlock.self,
-            Exercise.self,
-            SessionExecution.self
-        ])
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: .private("iCloud.com.victorkzam.WorkoutTracker")
-        )
-        do {
-            return try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            let local = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-            return try! ModelContainer(for: schema, configurations: [local])
-        }
-    }()
+    private let modelContainer = ModelContainerFactory.create()
 
     @State private var connectivity = WatchConnectivityManager.shared
     @State private var watchSession = WatchSessionController()
