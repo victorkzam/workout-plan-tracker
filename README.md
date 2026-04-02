@@ -1,5 +1,10 @@
 # WorkoutTracker
 
+![CI](https://github.com/victorkzam/workout-plan-tracker/actions/workflows/ci.yml/badge.svg)
+![Swift 5.9+](https://img.shields.io/badge/Swift-5.9+-orange.svg)
+![iOS 17+](https://img.shields.io/badge/iOS-17+-blue.svg)
+![watchOS 10+](https://img.shields.io/badge/watchOS-10+-green.svg)
+
 Native iOS + Apple Watch workout tracker that parses LLM-generated text plans into structured sessions with step-by-step timers, GPS tracking, and HealthKit integration.
 
 ## Features
@@ -9,6 +14,8 @@ Native iOS + Apple Watch workout tracker that parses LLM-generated text plans in
 - **GPS Tracking** — live pace, distance, and route map (MapKit) for running and cycling blocks
 - **Apple Watch** — mirrors the active iPhone session with haptics; can also run sessions independently with on-Watch GPS + HR via HealthKit
 - **iCloud Sync** — plans and history sync across your iPhone and Watch via CloudKit
+- **Accessibility** — full VoiceOver support across all screens
+- **Structured Logging** — unified diagnostics via `os.Logger` throughout the app
 
 ## Requirements
 
@@ -18,23 +25,30 @@ Native iOS + Apple Watch workout tracker that parses LLM-generated text plans in
 - Active Apple Developer account (for HealthKit, CloudKit, and Watch)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen) to generate the `.xcodeproj`
 
-## Setup
+## Development
 
-### 1. Install XcodeGen
+### Prerequisites
+- Xcode 15+
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
 
+### Setup
 ```bash
-brew install xcodegen
-```
-
-### 2. Clone and generate the Xcode project
-
-```bash
-git clone <repo-url>
+# Clone the repo
+git clone https://github.com/victorkzam/workout-plan-tracker.git
 cd workout-plan-tracker
+
+# Copy secrets template
+cp Secrets.xcconfig.template Secrets.xcconfig
+# Edit Secrets.xcconfig with your OpenRouter API key
+
+# Generate Xcode project
 xcodegen generate
+
+# Open in Xcode
+open WorkoutTracker.xcodeproj
 ```
 
-### 3. Configure your API key (cloud fallback only)
+### Configure your API key (cloud fallback only)
 
 The app uses **Apple Foundation Models** on-device (iOS 18+) as the primary parser — no API key needed for that path.
 
@@ -52,7 +66,7 @@ OPENROUTER_API_KEY = sk-or-v1-YOUR_KEY_HERE
 
 > `Secrets.xcconfig` is gitignored and will never be committed.
 
-### 4. Configure signing
+### Configure signing
 
 Open `WorkoutTracker.xcodeproj`, select the `WorkoutTracker` and `WorkoutTrackerWatch` targets, and set your **Team** in Signing & Capabilities.
 
@@ -64,14 +78,25 @@ settings:
 ```
 Then re-run `xcodegen generate`.
 
-### 5. Enable CloudKit
+### Enable CloudKit
 
 In the [CloudKit Console](https://icloud.developer.apple.com/), create a container named:
 ```
 iCloud.com.victorkzam.WorkoutTracker
 ```
 
-### 6. Run
+### Running Tests
+```bash
+xcodegen generate
+xcodebuild test -scheme WorkoutTrackerTests -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
+### Linting
+```bash
+swiftlint lint
+```
+
+### Run
 
 Build and run the `WorkoutTracker` scheme on your iPhone. The Watch app is automatically pushed if a paired Watch is connected.
 
@@ -81,7 +106,9 @@ Build and run the `WorkoutTracker` scheme on your iPhone. The Watch app is autom
 workout-plan-tracker/
 ├── Shared/                    # Shared between iOS + Watch (SwiftData models, WatchConnectivity)
 │   ├── Models/                # WorkoutPlan, WorkoutSession, WorkoutBlock, Exercise, SessionExecution
-│   └── Services/              # WatchConnectivityManager
+│   ├── Protocols/             # Service protocol abstractions
+│   ├── Services/              # WatchConnectivityManager
+│   └── Utilities/             # Shared utilities (GPSMath, Logging, ModelContainerFactory)
 ├── iOS/
 │   ├── App/                   # App entry point, Info.plist, entitlements
 │   ├── Services/              # WorkoutParserService, AppleFoundationParser, OpenRouterParser,
@@ -91,10 +118,13 @@ workout-plan-tracker/
 │       ├── Plans/             # PlanListView, PasteImportView, PlanDetailView, SessionDetailView
 │       ├── Sessions/          # SessionExecutionView, ExerciseStepView, GPSRunView
 │       └── Components/        # HRZoneTag, PaceDisplay, BlockTypeBadge
-└── Watch/
-    ├── WatchApp.swift         # Entry point + WatchSessionController
-    ├── Services/              # WorkoutSessionManager (HKWorkoutSession + GPS)
-    └── Views/                 # SessionListWatchView, SessionWatchView, GPSWatchView, …
+├── Watch/
+│   ├── WatchApp.swift         # Entry point + WatchSessionController
+│   ├── Services/              # WorkoutSessionManager (HKWorkoutSession + GPS)
+│   └── Views/                 # SessionListWatchView, SessionWatchView, GPSWatchView, ...
+├── Tests/                     # Unit tests with mocks
+├── .claude/agents/            # Claude Code subagent definitions
+└── docs/                      # Project documentation
 ```
 
 ## LLM Parsing
@@ -105,6 +135,13 @@ workout-plan-tracker/
 | Cloud (OpenRouter) | iOS 17, or plan > 3 500 tokens | Gemini 2.0 Flash Lite |
 
 Both paths produce the same `ParsedWorkoutPlan` struct, which is converted to SwiftData models.
+
+## Documentation
+
+- [Contributing Guide](CONTRIBUTING.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Coding Standards](docs/CODING_STANDARDS.md)
+- [Code Review](docs/CODE_REVIEW.md)
 
 ## Verification checklist
 
