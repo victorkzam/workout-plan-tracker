@@ -1,5 +1,6 @@
 import Foundation
 import CoreLocation
+import os
 
 @Observable
 final class LocationService: NSObject, LocationServiceProtocol {
@@ -33,6 +34,7 @@ final class LocationService: NSObject, LocationServiceProtocol {
     }
 
     func start() {
+        Logger.location.info("Location tracking started")
         sessionStartDate = Date()
         totalDistanceMeters = 0
         currentPaceSecPerKm = 0
@@ -44,6 +46,7 @@ final class LocationService: NSObject, LocationServiceProtocol {
     }
 
     func stop() {
+        Logger.location.info("Location tracking stopped")
         manager.stopUpdatingLocation()
         stopElapsedTimer()
     }
@@ -87,31 +90,35 @@ final class LocationService: NSObject, LocationServiceProtocol {
 extension LocationService: CLLocationManagerDelegate {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        DispatchQueue.main.async {
-            self.authorizationStatus = manager.authorizationStatus
+        let status = manager.authorizationStatus
+        Logger.location.info("Authorization status changed: \(String(describing: status))")
+        Task { @MainActor in
+            self.authorizationStatus = status
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        for location in locations {
-            guard location.horizontalAccuracy < 20,    // discard noisy readings
-                  location.horizontalAccuracy >= 0 else { continue }
+        Task { @MainActor in
+            for location in locations {
+                guard location.horizontalAccuracy < 20,    // discard noisy readings
+                      location.horizontalAccuracy >= 0 else { continue }
 
-            route.append(location)
+                self.route.append(location)
 
-            // Accumulate distance
-            if let prev = previousLocation {
-                totalDistanceMeters += location.distance(from: prev)
-            }
-            previousLocation = location
+                // Accumulate distance
+                if let prev = self.previousLocation {
+                    self.totalDistanceMeters += location.distance(from: prev)
+                }
+                self.previousLocation = location
 
-            // Smooth pace using 3-point rolling average of raw GPS speed
-            let rawSpeedMps = max(location.speed, 0)
-            if rawSpeedMps > 0.5 {                     // ignore near-stationary
-                recentSpeeds.append(rawSpeedMps)
-                if recentSpeeds.count > 3 { recentSpeeds.removeFirst() }
-                let avgSpeed = GPSMath.smoothSpeed(recentSpeeds: recentSpeeds)
-                currentPaceSecPerKm = GPSMath.paceFromSpeed(avgSpeed)
+                // Smooth pace using 3-point rolling average of raw GPS speed
+                let rawSpeedMps = max(location.speed, 0)
+                if rawSpeedMps > 0.5 {                     // ignore near-stationary
+                    self.recentSpeeds.append(rawSpeedMps)
+                    if self.recentSpeeds.count > 3 { self.recentSpeeds.removeFirst() }
+                    let avgSpeed = GPSMath.smoothSpeed(recentSpeeds: self.recentSpeeds)
+                    self.currentPaceSecPerKm = GPSMath.paceFromSpeed(avgSpeed)
+                }
             }
         }
     }

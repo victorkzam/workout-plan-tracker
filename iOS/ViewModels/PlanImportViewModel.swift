@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import os
 
 @Observable
 final class PlanImportViewModel {
@@ -33,7 +34,11 @@ final class PlanImportViewModel {
         switch parserService.state {
         case .success(let plan):
             modelContext.insert(plan)
-            try? modelContext.save()
+            do {
+                try modelContext.save()
+            } catch {
+                Logger.parser.error("Failed to save imported plan: \(error.localizedDescription)")
+            }
             parsedPlan = plan
 
         case .failure(let error):

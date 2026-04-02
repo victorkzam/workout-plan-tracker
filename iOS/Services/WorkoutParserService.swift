@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 // MARK: - WorkoutParserService
 // Routes parsing to Apple Foundation Models (on-device, iOS 18+) or
@@ -41,13 +42,16 @@ final class WorkoutParserService: WorkoutParserProtocol {
 
     private func performParse(rawText: String) async throws -> WorkoutPlan {
         let estimatedTokens = Int(Double(rawText.count) / charsPerToken)
+        Logger.parser.info("Token estimate: \(estimatedTokens), limit: \(self.onDeviceTokenLimit)")
 
         #if canImport(FoundationModels)
         if #available(iOS 26.0, *), estimatedTokens <= onDeviceTokenLimit {
+            Logger.parser.info("Routing to on-device parser")
             return try await parseOnDevice(rawText: rawText)
         }
         #endif
 
+        Logger.parser.info("Routing to cloud parser")
         return try await parseCloud(rawText: rawText)
     }
 

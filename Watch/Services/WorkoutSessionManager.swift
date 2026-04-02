@@ -2,6 +2,7 @@ import Foundation
 import HealthKit
 import CoreLocation
 import WatchKit
+import os
 
 // Manages an independent HKWorkoutSession on the Watch for GPS runs/cycles.
 // Sends live metrics back to iPhone every 5 seconds via WatchConnectivity.
@@ -49,10 +50,13 @@ final class WorkoutSessionManager: NSObject {
             try await wb.beginCollection(at: Date())
             sessionStartDate = Date()
             isRunning = true
+            Logger.workout.info("Watch workout started")
             startLocationTracking()
             startElapsedTimer()
             startBroadcastTimer()
-        } catch {}
+        } catch {
+            Logger.workout.error("Failed to start watch workout: \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Stop
@@ -62,7 +66,10 @@ final class WorkoutSessionManager: NSObject {
         do {
             try await builder?.endCollection(at: Date())
             _ = try await builder?.finishWorkout()
-        } catch {}
+            Logger.workout.info("Watch workout stopped and saved")
+        } catch {
+            Logger.workout.error("Failed to finish watch workout: \(error.localizedDescription)")
+        }
         stopLocationTracking()
         stopElapsedTimer()
         stopBroadcastTimer()
@@ -71,6 +78,7 @@ final class WorkoutSessionManager: NSObject {
     }
 
     func pauseWorkout() {
+        Logger.workout.info("Watch workout paused")
         session?.pause()
         isRunning = false
         stopElapsedTimer()
@@ -78,6 +86,7 @@ final class WorkoutSessionManager: NSObject {
     }
 
     func resumeWorkout() {
+        Logger.workout.info("Watch workout resumed")
         session?.resume()
         isRunning = true
         startElapsedTimer()
@@ -153,9 +162,13 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
     func workoutSession(_ ws: HKWorkoutSession,
                         didChangeTo toState: HKWorkoutSessionState,
                         from fromState: HKWorkoutSessionState,
-                        date: Date) {}
+                        date: Date) {
+        Logger.workout.info("Workout session state: \(String(describing: fromState)) -> \(String(describing: toState))")
+    }
 
-    func workoutSession(_ ws: HKWorkoutSession, didFailWithError error: Error) {}
+    func workoutSession(_ ws: HKWorkoutSession, didFailWithError error: Error) {
+        Logger.workout.error("Workout session failed: \(error.localizedDescription)")
+    }
 }
 
 // MARK: - HKLiveWorkoutBuilderDelegate
@@ -169,10 +182,11 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
             guard let quantityType = type as? HKQuantityType else { continue }
             guard let stats = builder.statistics(for: quantityType) else { continue }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 if quantityType == HKQuantityType(.heartRate) {
                     self.heartRate = stats.mostRecentQuantity()?
                         .doubleValue(for: .init(from: "count/min")) ?? self.heartRate
+                    Logger.workout.debug("Watch heart rate updated")
                 }
             }
         }
@@ -183,19 +197,21 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
 
 extension WorkoutSessionManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        for loc in locations {
-            guard loc.horizontalAccuracy < 20, loc.horizontalAccuracy >= 0 else { continue }
-            route.append(loc)
-            if let prev = previousLocation {
-                distance += loc.distance(from: prev)
-            }
-            previousLocation = loc
-            let speed = max(loc.speed, 0)
-            if speed > 0.5 {
-                recentSpeeds.append(speed)
-                if recentSpeeds.count > 3 { recentSpeeds.removeFirst() }
-                let avg = GPSMath.smoothSpeed(recentSpeeds: recentSpeeds)
-                currentPaceSecPerKm = GPSMath.paceFromSpeed(avg)
+        Task { @MainActor in
+            for loc in locations {
+                guard loc.horizontalAccuracy < 20, loc.horizontalAccuracy >= 0 else { continue }
+                self.route.append(loc)
+                if let prev = self.previousLocation {
+                    self.distance += loc.distance(from: prev)
+                }
+                self.previousLocation = loc
+                let speed = max(loc.speed, 0)
+                if speed > 0.5 {
+                    self.recentSpeeds.append(speed)
+                    if self.recentSpeeds.count > 3 { self.recentSpeeds.removeFirst() }
+                    let avg = GPSMath.smoothSpeed(recentSpeeds: self.recentSpeeds)
+                    self.currentPaceSecPerKm = GPSMath.paceFromSpeed(avg)
+                }
             }
         }
     }

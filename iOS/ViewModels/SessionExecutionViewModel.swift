@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 import Combine
 import CoreLocation
+import os
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -188,7 +189,11 @@ final class SessionExecutionViewModel {
         exec.avgHeartRate        = healthKitService.currentHeartRate
         exec.routeData           = encodeRoute(locationService.route)
         modelContext.insert(exec)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            Logger.workout.error("Failed to save session execution: \(error.localizedDescription)")
+        }
     }
 
     private func encodeRoute(_ locations: [CLLocation]) -> Data? {

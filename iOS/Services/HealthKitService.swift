@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import os
 
 @Observable
 final class HealthKitService: HealthKitServiceProtocol {
@@ -34,8 +35,10 @@ final class HealthKitService: HealthKitServiceProtocol {
         do {
             try await store.requestAuthorization(toShare: typesToShare, read: typesToRead)
             isAuthorized = true
+            Logger.healthKit.info("HealthKit authorization granted")
         } catch {
             isAuthorized = false
+            Logger.healthKit.error("HealthKit authorization failed: \(error.localizedDescription)")
         }
     }
 
@@ -44,6 +47,7 @@ final class HealthKitService: HealthKitServiceProtocol {
     func startWorkoutSession(activityType: HKWorkoutActivityType) async {
         guard Self.isAvailable else { return }
         guard #available(iOS 26.0, *) else {
+            Logger.healthKit.info("iOS < 26, falling back to HR-only tracking")
             startHeartRateUpdates()
             return
         }
@@ -60,8 +64,10 @@ final class HealthKitService: HealthKitServiceProtocol {
             liveBuilder = builder
             session.startActivity(with: Date())
             try await builder.beginCollection(at: Date())
+            Logger.healthKit.info("Workout session started")
             startHeartRateUpdates()
         } catch {
+            Logger.healthKit.error("Failed to start workout session: \(error.localizedDescription)")
             startHeartRateUpdates()
         }
     }
@@ -73,7 +79,10 @@ final class HealthKitService: HealthKitServiceProtocol {
                 do {
                     try await builder.endCollection(at: Date())
                     _ = try await builder.finishWorkout()
-                } catch {}
+                    Logger.healthKit.info("Workout session ended and saved")
+                } catch {
+                    Logger.healthKit.error("Failed to finish workout session: \(error.localizedDescription)")
+                }
             }
         }
         stopHeartRateUpdates()
@@ -109,7 +118,10 @@ final class HealthKitService: HealthKitServiceProtocol {
         guard let samples = samples as? [HKQuantitySample],
               let latest = samples.last else { return }
         let bpm = latest.quantity.doubleValue(for: .init(from: "count/min"))
-        DispatchQueue.main.async { self.currentHeartRate = bpm }
+        Task { @MainActor in
+            self.currentHeartRate = bpm
+            Logger.healthKit.debug("Heart rate updated")
+        }
     }
 }
 

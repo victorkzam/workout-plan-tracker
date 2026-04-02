@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 // MARK: - OpenRouter / Gemini 2.5 Flash Lite parser (free tier)
 
@@ -13,9 +14,12 @@ final class OpenRouterParser {
     }
 
     func parse(rawText: String) async throws -> ParsedWorkoutPlan {
+        Logger.parser.info("OpenRouter parse started, input length: \(rawText.count)")
         let body = buildRequestBody(rawText: rawText)
         let data = try await post(body: body)
-        return try extractPlan(from: data)
+        let plan = try extractPlan(from: data)
+        Logger.parser.info("OpenRouter parse succeeded")
+        return plan
     }
 
     // MARK: - Private
@@ -41,12 +45,15 @@ final class OpenRouterParser {
         request.setValue("Bearer \(apiKey)",  forHTTPHeaderField: "Authorization")
         request.setValue("WorkoutTracker/1.0", forHTTPHeaderField: "X-Title")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.timeoutInterval = 30
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+            Logger.parser.error("OpenRouter HTTP error: \(code)")
             throw ParserError.httpError(code)
         }
+        Logger.parser.info("OpenRouter response status: \(http.statusCode)")
         return data
     }
 
