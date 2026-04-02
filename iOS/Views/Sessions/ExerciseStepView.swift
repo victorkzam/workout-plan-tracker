@@ -41,6 +41,7 @@ struct ExerciseStepView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(step.isRest ? "Rest" : step.exercise.name)
                 .font(.system(size: 32, weight: .bold))
+                .accessibilityLabel("Current exercise: \(step.isRest ? "Rest" : step.exercise.name)")
             if !step.exercise.sideNote.isEmpty {
                 Text(step.exercise.sideNote)
                     .font(.subheadline)
@@ -139,6 +140,9 @@ struct TimerRingView: View {
             }
         }
         .padding(20)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Time remaining")
+        .accessibilityValue("\(timeRemaining) seconds")
     }
 
     private var timeString: String {

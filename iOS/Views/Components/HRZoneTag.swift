@@ -5,10 +5,8 @@ struct HRZoneTag: View {
     var currentHR: Double = 0
 
     var body: some View {
-        guard exercise.hasHRZone else { return AnyView(EmptyView()) }
-
-        let status = hrStatus
-        return AnyView(
+        if exercise.hasHRZone {
+            let status = hrStatus
             HStack(spacing: 4) {
                 Image(systemName: "heart.fill")
                 Text(hrLabel)
@@ -18,7 +16,9 @@ struct HRZoneTag: View {
             .padding(.horizontal, 10).padding(.vertical, 5)
             .background(statusColor(status).opacity(0.12))
             .clipShape(Capsule())
-        )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Heart rate zone \(exercise.hrZoneName.isEmpty ? "" : exercise.hrZoneName), \(exercise.hrZoneMin) to \(exercise.hrZoneMax) bpm")
+        }
     }
 
     private var hrLabel: String {
@@ -56,6 +56,7 @@ struct BlockTypeBadge: View {
             .frame(width: 22, height: 22)
             .background(badgeColor)
             .clipShape(RoundedRectangle(cornerRadius: 5))
+            .accessibilityLabel("\(blockType.rawValue) block")
     }
 
     private var iconName: String {

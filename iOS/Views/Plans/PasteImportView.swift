@@ -60,6 +60,7 @@ struct PasteImportView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .font(.system(.body, design: .monospaced))
             .autocorrectionDisabled()
+            .accessibilityLabel("Paste your workout plan text here")
     }
 
     private func errorBanner(_ message: String) -> some View {
@@ -98,5 +99,6 @@ struct PasteImportView: View {
         }
         .buttonStyle(.borderedProminent)
         .disabled(!viewModel.canParse)
+        .accessibilityLabel(viewModel.isParsing ? "Parsing workout plan" : "Parse workout plan")
     }
 }

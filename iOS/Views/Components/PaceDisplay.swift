@@ -21,6 +21,8 @@ struct PaceDisplay: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Current pace: \(currentPaceString)")
     }
 
     private var currentPaceString: String {
@@ -69,6 +71,8 @@ struct DistanceDisplay: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Distance: \(displayString)")
     }
 
     private var displayString: String {

@@ -55,6 +55,7 @@ struct GPSWatchView: View {
                             .foregroundStyle(isPaused ? .green : .yellow)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(isPaused ? "Resume run" : "Pause run")
 
                     Button {
                         onEnd()
@@ -63,6 +64,7 @@ struct GPSWatchView: View {
                             .foregroundStyle(.red)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("End run")
                 }
                 .font(.title3)
             }
@@ -85,5 +87,7 @@ struct GPSWatchView: View {
             Text(value)
                 .font(.system(.footnote, design: .rounded).weight(.semibold).monospacedDigit())
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
