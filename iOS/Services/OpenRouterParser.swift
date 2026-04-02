@@ -1,13 +1,13 @@
 import Foundation
 import os
 
-// MARK: - OpenRouter / GPT-OSS 120B parser (free tier)
+// MARK: - OpenRouter / Gemini 2.5 Flash Lite parser
 
 final class OpenRouterParser {
 
     private let apiKey: String
     private let baseURL = "https://openrouter.ai/api/v1/chat/completions"
-    private let model   = "openai/gpt-oss-120b:free"
+    private let model   = "google/gemini-2.5-flash-lite"
 
     init(apiKey: String) {
         self.apiKey = apiKey
@@ -150,13 +150,15 @@ enum ParserError: LocalizedError {
     case httpError(Int)
     case malformedResponse
     case onDeviceUnavailable
+    case noAPIKey
 
     var errorDescription: String? {
         switch self {
         case .invalidURL:            return "Invalid API URL."
         case .httpError(let code):   return "API error (HTTP \(code)). Please try again."
         case .malformedResponse:     return "Could not understand the workout plan. Please check the format and try again."
-        case .onDeviceUnavailable:   return "On-device model is not available and no API key is configured."
+        case .onDeviceUnavailable:   return "On-device model is not available. Please update to iOS 26 or configure an API key."
+        case .noAPIKey:              return "No API key configured. Add your OpenRouter key in Secrets.xcconfig."
         }
     }
 }

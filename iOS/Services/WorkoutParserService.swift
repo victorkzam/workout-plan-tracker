@@ -3,7 +3,7 @@ import os
 
 // MARK: - WorkoutParserService
 // Routes parsing to Apple Foundation Models (on-device, iOS 26+) or
-// OpenRouter GPT-OSS 120B (cloud fallback).
+// OpenRouter Gemini 2.5 Flash Lite (cloud fallback).
 
 #if canImport(FoundationModels)
 import FoundationModels
@@ -73,7 +73,7 @@ final class WorkoutParserService: WorkoutParserProtocol {
 
     private func parseCloud(rawText: String) async throws -> WorkoutPlan {
         guard !openRouterAPIKey.isEmpty else {
-            throw ParserError.onDeviceUnavailable
+            throw ParserError.noAPIKey
         }
         let parser = OpenRouterParser(apiKey: openRouterAPIKey)
         let parsed = try await parser.parse(rawText: rawText)

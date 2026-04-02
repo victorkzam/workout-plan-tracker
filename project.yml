@@ -38,7 +38,9 @@ targets:
         CODE_SIGN_ENTITLEMENTS: iOS/App/WorkoutTracker.entitlements
         TARGETED_DEVICE_FAMILY: "1"       # iPhone only
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: iOS
-    xcconfig: Secrets.xcconfig
+    configFiles:
+      Debug: Secrets.xcconfig
+      Release: Secrets.xcconfig
     capabilities:
       healthKit:
         enabled: YES
@@ -73,7 +75,9 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Watch/WorkoutTrackerWatch.entitlements
         TARGETED_DEVICE_FAMILY: "4"       # Apple Watch
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: watchOS
-    xcconfig: Secrets.xcconfig
+    configFiles:
+      Debug: Secrets.xcconfig
+      Release: Secrets.xcconfig
     capabilities:
       healthKit:
         enabled: YES
