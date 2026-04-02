@@ -84,3 +84,17 @@ targets:
       backgroundModes:
         modes:
           - workout-processing
+
+  # ─── Tests ─────────────────────────────────────────────────────────────────
+  WorkoutTrackerTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: WorkoutTracker
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.victorkzam.WorkoutTracker.tests
+        INFOPLIST_FILE: Tests/Info.plist
+        SWIFT_VERSION: "5.9"

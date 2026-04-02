@@ -10,7 +10,7 @@ import FoundationModels
 #endif
 
 @Observable
-final class WorkoutParserService {
+final class WorkoutParserService: WorkoutParserProtocol {
 
     enum State {
         case idle
@@ -22,7 +22,6 @@ final class WorkoutParserService {
     private(set) var state: State = .idle
 
     private let openRouterAPIKey: String
-    private let logger = Logger(subsystem: "com.workouttracker", category: "Parser")
 
     /// Approximate chars-per-token ratio for estimating token count without a tokenizer
     private let charsPerToken: Double = 4.0
@@ -47,23 +46,26 @@ final class WorkoutParserService {
 
     private func performParse(rawText: String) async throws -> WorkoutPlan {
         let estimatedTokens = Int(Double(rawText.count) / charsPerToken)
+        Logger.parser.info("Token estimate: \(estimatedTokens), limit: \(self.onDeviceTokenLimit)")
 
         #if canImport(FoundationModels)
         if #available(iOS 26.0, *), estimatedTokens <= onDeviceTokenLimit {
             let availability = SystemLanguageModel.default.availability
             if availability == .available {
                 do {
+                    Logger.parser.info("Routing to on-device parser")
                     return try await parseOnDevice(rawText: rawText)
                 } catch {
-                    logger.warning("On-device parsing failed: \(error.localizedDescription, privacy: .public). Falling back to cloud.")
+                    Logger.parser.warning("On-device parsing failed: \(error.localizedDescription, privacy: .public). Falling back to cloud.")
                     return try await parseCloud(rawText: rawText)
                 }
             } else {
-                logger.info("On-device model not available (status: \(String(describing: availability), privacy: .public)). Using cloud parser.")
+                Logger.parser.info("On-device model not available (status: \(String(describing: availability), privacy: .public)). Using cloud parser.")
             }
         }
         #endif
 
+        Logger.parser.info("Routing to cloud parser")
         return try await parseCloud(rawText: rawText)
     }
 

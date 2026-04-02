@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 import Combine
 import CoreLocation
+import os
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -23,16 +24,16 @@ final class SessionExecutionViewModel {
     private(set) var elapsedTotal: Double = 0
 
     // Dependencies
-    let locationService: LocationService
-    let healthKitService: HealthKitService
+    let locationService: any LocationServiceProtocol
+    let healthKitService: any HealthKitServiceProtocol
 
     private var timerCancellable: AnyCancellable?
     private var totalElapsedTimer: AnyCancellable?
     private var sessionStartDate: Date?
 
     init(session: WorkoutSession,
-         locationService: LocationService,
-         healthKitService: HealthKitService) {
+         locationService: any LocationServiceProtocol = LocationService(),
+         healthKitService: any HealthKitServiceProtocol = HealthKitService()) {
         self.session = session
         self.locationService = locationService
         self.healthKitService = healthKitService
@@ -188,7 +189,11 @@ final class SessionExecutionViewModel {
         exec.avgHeartRate        = healthKitService.currentHeartRate
         exec.routeData           = encodeRoute(locationService.route)
         modelContext.insert(exec)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            Logger.workout.error("Failed to save session execution: \(error.localizedDescription)")
+        }
     }
 
     private func encodeRoute(_ locations: [CLLocation]) -> Data? {

@@ -20,6 +20,8 @@ struct PlanListView: View {
                             NavigationLink(destination: PlanDetailView(plan: plan)) {
                                 PlanRowView(plan: plan)
                             }
+                            .accessibilityLabel("Workout plan: \(plan.name)")
+                            .accessibilityValue("\((plan.sessions ?? []).count) sessions")
                         }
                         .onDelete(perform: deletePlans)
                     }

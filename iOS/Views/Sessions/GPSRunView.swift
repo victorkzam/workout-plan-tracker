@@ -48,6 +48,7 @@ struct GPSRunView: View {
             MapUserLocationButton()
             MapCompass()
         }
+        .accessibilityLabel("Route map")
     }
 
     // MARK: - Metrics overlay
@@ -103,6 +104,7 @@ struct GPSRunView: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(.yellow)
+                .accessibilityLabel(isPaused ? "Resume run" : "Pause run")
 
                 Button {
                     locationService.stop()
@@ -114,6 +116,7 @@ struct GPSRunView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
+                .accessibilityLabel("End run")
             }
             .padding(.horizontal)
             .padding(.bottom, 20)
@@ -189,6 +192,7 @@ private struct MetricCard<Content: View>: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground).opacity(0.8))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
     }
 }
 

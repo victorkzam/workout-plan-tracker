@@ -44,6 +44,8 @@ struct SessionWatchView: View {
                 ProgressView(value: progressFraction)
                     .tint(.green)
                     .padding(.horizontal)
+                    .accessibilityLabel("Workout progress")
+                    .accessibilityValue("Step \(currentIndex + 1) of \(isStandaloneMode ? localSteps.count : controller.totalSteps)")
 
                 // Block label
                 Text(currentBlockName)
@@ -57,6 +59,7 @@ struct SessionWatchView: View {
                     .font(.system(size: 18, weight: .bold))
                     .lineLimit(3)
                     .padding(.horizontal)
+                    .accessibilityLabel("Current exercise: \(currentExerciseName)")
 
                 // Round indicator
                 if currentTotalRounds > 1 {
@@ -70,6 +73,7 @@ struct SessionWatchView: View {
                     WatchTimerRing(timeRemaining: currentTimeRemaining,
                                    totalTime: currentTotalTime)
                         .frame(height: 80)
+                        .accessibilityLabel("Time remaining: \(currentTimeRemaining) seconds")
                 }
 
                 // GPS launch button
@@ -91,6 +95,7 @@ struct SessionWatchView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(currentIndex == 0)
+                    .accessibilityLabel("Go to previous step")
 
                     Button {
                         togglePause()
@@ -99,6 +104,7 @@ struct SessionWatchView: View {
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(isCurrentlyRunning ? .yellow : .green)
+                    .accessibilityLabel(isCurrentlyRunning ? "Pause workout" : "Resume workout")
 
                     Button {
                         advanceLocal()
@@ -106,6 +112,7 @@ struct SessionWatchView: View {
                         Image(systemName: "forward.end.fill")
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Skip to next step")
                 }
                 .font(.title3)
                 .padding(.top, 4)

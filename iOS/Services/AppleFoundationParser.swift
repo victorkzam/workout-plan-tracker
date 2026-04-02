@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 // MARK: - Apple Foundation Models parser (iOS 18+)
 // Uses the FoundationModels framework with @Generable for guaranteed structured output.
@@ -116,11 +117,13 @@ final class AppleFoundationParser {
     }
 
     func parse(rawText: String) async throws -> ParsedWorkoutPlan {
+        Logger.parser.info("On-device parse started, input length: \(rawText.count)")
         let result = try await session.respond(
             to: rawText,
             generating: GenParsedWorkoutPlan.self
         )
 
+        Logger.parser.info("On-device parse succeeded")
         return result.content.toParsedWorkoutPlan()
     }
 }

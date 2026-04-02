@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -scheme WorkoutTracker \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Run Tests
+        run: |
+          xcodebuild test \
+            -scheme WorkoutTrackerTests \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: SwiftLint
+        run: |
+          brew install swiftlint
+          swiftlint lint --reporter github-actions-logging

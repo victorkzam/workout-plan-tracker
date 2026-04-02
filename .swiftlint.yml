@@ -1,0 +1,61 @@
+# SwiftLint Configuration for WorkoutTracker
+# Swift 5.9+ / SwiftUI / SwiftData
+
+excluded:
+  - .build
+  - DerivedData
+  - Tests
+
+disabled_rules:
+  - trailing_whitespace
+  - type_name
+
+opt_in_rules:
+  - empty_count
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_first_not_nil
+  - discouraged_object_literal
+  - empty_string
+  - first_where
+  - force_unwrapping
+  - last_where
+  - modifier_order
+  - overridden_super_call
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_whitespace_closing_braces
+
+line_length:
+  warning: 120
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+type_body_length:
+  warning: 300
+  error: 500
+
+file_length:
+  warning: 500
+  error: 1000
+
+function_body_length:
+  warning: 50
+  error: 100
+
+# Allow trailing closure syntax
+trailing_closure:
+  only_single_muted_parameter: true
+
+# Support macros used in the project (@Observable, @Model, @Generable)
+custom_rules:
+  mark_comment_spacing:
+    name: "MARK Comment Spacing"
+    regex: "//\\s*MARK:\\s*-?\\s*\\S"
+    message: "MARK comments should follow the pattern: // MARK: - Section Name"
+    severity: warning

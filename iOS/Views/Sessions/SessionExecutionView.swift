@@ -86,6 +86,9 @@ struct SessionExecutionView: View {
             .font(.caption.monospacedDigit())
             .foregroundStyle(.secondary)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Workout progress")
+        .accessibilityValue("Step \(viewModel.currentStepIndex + 1) of \(viewModel.totalSteps), elapsed \(elapsedString)")
     }
 
     private var gpsLaunchBanner: some View {
@@ -110,6 +113,7 @@ struct SessionExecutionView: View {
                     .font(.title2)
             }
             .disabled(viewModel.currentStepIndex == 0)
+            .accessibilityLabel("Go to previous step")
 
             Button {
                 viewModel.isRunning ? viewModel.pauseSession() : viewModel.resumeSession()
@@ -118,6 +122,7 @@ struct SessionExecutionView: View {
                     .font(.system(size: 44))
                     .foregroundStyle(viewModel.isRunning ? .yellow : .green)
             }
+            .accessibilityLabel(viewModel.isRunning ? "Pause workout" : "Start workout")
 
             Button {
                 viewModel.skipToNext()
@@ -125,6 +130,7 @@ struct SessionExecutionView: View {
                 Image(systemName: "forward.end.fill")
                     .font(.title2)
             }
+            .accessibilityLabel("Skip to next step")
         }
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity)
@@ -158,6 +164,7 @@ struct SessionExecutionView: View {
         ToolbarItem(placement: .cancellationAction) {
             Button("End") { showEndConfirmation = true }
                 .foregroundStyle(.red)
+                .accessibilityLabel("End workout session")
         }
     }
 
