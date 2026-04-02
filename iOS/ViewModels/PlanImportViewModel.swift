@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 import os
 
-@Observable
+@Observable @MainActor
 final class PlanImportViewModel {
 
     var rawText: String = ""

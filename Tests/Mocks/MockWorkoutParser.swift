@@ -7,7 +7,7 @@ final class MockWorkoutParser: WorkoutParserProtocol {
 
     // MARK: - Observable properties
 
-    private(set) var state: WorkoutParserService.State = .idle
+    private(set) var state: ParserState = .idle
 
     // MARK: - Call tracking
 

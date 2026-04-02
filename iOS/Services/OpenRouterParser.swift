@@ -1,13 +1,13 @@
 import Foundation
 import os
 
-// MARK: - OpenRouter / Gemini 2.5 Flash Lite parser (free tier)
+// MARK: - OpenRouter / GPT-OSS 120B parser (free tier)
 
 final class OpenRouterParser {
 
     private let apiKey: String
     private let baseURL = "https://openrouter.ai/api/v1/chat/completions"
-    private let model   = "google/gemini-2.5-flash-lite"
+    private let model   = "openai/gpt-oss-120b:free"
 
     init(apiKey: String) {
         self.apiKey = apiKey

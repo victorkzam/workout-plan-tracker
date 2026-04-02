@@ -21,7 +21,7 @@ struct WorkoutTrackerWatchApp: App {
 // MARK: - WatchSessionController
 // Receives step updates from iPhone and holds live session state.
 
-@Observable
+@Observable @MainActor
 final class WatchSessionController {
 
     var exerciseName: String = ""

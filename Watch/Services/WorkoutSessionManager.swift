@@ -131,13 +131,16 @@ final class WorkoutSessionManager: NSObject {
     }
 
     private func broadcastMetrics() {
-        WatchConnectivityManager.shared.sendMessage([
+        let metrics: [String: Any] = [
             WCMessageKey.type:        WCMessageType.gpsMetrics.rawValue,
             WCMessageKey.currentPace: currentPaceSecPerKm,
             WCMessageKey.distance:    distance,
             WCMessageKey.heartRate:   heartRate,
             WCMessageKey.elapsedTime: elapsedSeconds
-        ])
+        ]
+        Task { @MainActor in
+            WatchConnectivityManager.shared.sendMessage(metrics)
+        }
     }
 
     // MARK: - Formatting

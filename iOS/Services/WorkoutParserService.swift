@@ -3,7 +3,7 @@ import os
 
 // MARK: - WorkoutParserService
 // Routes parsing to Apple Foundation Models (on-device, iOS 26+) or
-// OpenRouter Gemini 2.5 Flash Lite (cloud fallback).
+// OpenRouter GPT-OSS 120B (cloud fallback).
 
 #if canImport(FoundationModels)
 import FoundationModels
@@ -12,14 +12,7 @@ import FoundationModels
 @Observable
 final class WorkoutParserService: WorkoutParserProtocol {
 
-    enum State {
-        case idle
-        case parsing
-        case success(WorkoutPlan)
-        case failure(Error)
-    }
-
-    private(set) var state: State = .idle
+    private(set) var state: ParserState = .idle
 
     private let openRouterAPIKey: String
 

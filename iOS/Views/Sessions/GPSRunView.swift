@@ -5,8 +5,8 @@ import CoreLocation
 struct GPSRunView: View {
 
     let exercise: Exercise
-    let locationService: LocationService
-    let healthKitService: HealthKitService
+    let locationService: any LocationServiceProtocol
+    let healthKitService: any HealthKitServiceProtocol
     var onEnd: () -> Void
 
     @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .automatic)

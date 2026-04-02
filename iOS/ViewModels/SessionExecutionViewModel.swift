@@ -9,7 +9,7 @@ import UIKit
 
 // MARK: - SessionExecutionViewModel
 
-@Observable
+@Observable @MainActor
 final class SessionExecutionViewModel {
 
     // Session state
@@ -32,8 +32,8 @@ final class SessionExecutionViewModel {
     private var sessionStartDate: Date?
 
     init(session: WorkoutSession,
-         locationService: any LocationServiceProtocol = LocationService(),
-         healthKitService: any HealthKitServiceProtocol = HealthKitService()) {
+         locationService: any LocationServiceProtocol,
+         healthKitService: any HealthKitServiceProtocol) {
         self.session = session
         self.locationService = locationService
         self.healthKitService = healthKitService
