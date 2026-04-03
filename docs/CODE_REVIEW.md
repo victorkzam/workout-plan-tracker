@@ -115,6 +115,12 @@ WorkoutTracker is a well-structured iOS 17+ / watchOS 10+ fitness app that parse
 - **Issue**: If `HKWorkoutSession` init or `beginCollection` throws, the error is silently caught and only `startHeartRateUpdates()` runs. The user gets no indication that HealthKit workout tracking failed (no calories/active energy will be recorded).
 - **Suggestion**: Propagate the error or set an observable error state.
 
+### ~~M6b. HealthKit read authorization missing `workoutType` — FIXED~~
+
+- **File**: `iOS/Services/HealthKitService.swift`, line 27
+- **Issue**: `typesToRead` included `HKSeriesType.workoutRoute()` but not `HKObjectType.workoutType()`. HealthKit requires read access to workouts when requesting workout routes, and threw an uncaught `NSInvalidArgumentException` that crashed the app every time the session tracker opened.
+- **Fix**: Added `HKObjectType.workoutType()` to `typesToRead` (commit 53779b8).
+
 ### M7. `SessionExecution.avgHeartRate` stores only the instantaneous HR at session end
 
 - **File**: `iOS/ViewModels/SessionExecutionViewModel.swift`, line 188
