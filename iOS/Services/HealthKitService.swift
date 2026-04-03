@@ -24,7 +24,8 @@ final class HealthKitService: HealthKitServiceProtocol {
             HKQuantityType(.activeEnergyBurned),
             HKQuantityType(.distanceWalkingRunning),
             HKQuantityType(.distanceCycling),
-            HKSeriesType.workoutRoute()
+            HKSeriesType.workoutRoute(),
+            HKObjectType.workoutType()
         ]
         let typesToShare: Set<HKSampleType> = [
             HKQuantityType(.activeEnergyBurned),
